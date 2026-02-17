@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import API from "../../api";
 import "./index.css";
 import { useNavigate } from "react-router-dom";
@@ -10,16 +10,7 @@ function Dashboard() {
 
   const token = localStorage.getItem("token");
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    fetchDashboard();
-  }, [token, navigate]);
-
-  const fetchDashboard = async () => {
+  const fetchDashboard = useCallback(async () => {
     try {
       const res = await API.get("/dashboard");
 
@@ -27,7 +18,15 @@ function Dashboard() {
     } catch {
       alert("Failed to fetch dashboard");
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchDashboard();
+    }
+  }, [token, navigate, fetchDashboard]);
 
   const today = new Date();
 
